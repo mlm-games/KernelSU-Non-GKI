@@ -4,7 +4,7 @@ import { readdir, writeFile } from 'fs/promises'
 import { resolve } from 'path'
 
 export default defineConfig( {
-    base: 'KernelSU-nongki',
+    base: '/KernelSU-nongki/',
     title: 'KernelSU',
     locales: locales.locales,
     sitemap: {
