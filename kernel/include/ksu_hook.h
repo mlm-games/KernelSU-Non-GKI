@@ -34,6 +34,5 @@ extern int ksu_handle_execveat_sucompat(int *fd, struct filename **filename_ptr,
 extern bool ksu_vfs_read_hook __read_mostly;
 
 extern bool ksu_input_hook __read_mostly;
-extern int ksu_handle_input_handle_event(unsigned int *type, unsigned int *code, int *value);
 
 extern int ksu_handle_devpts(struct inode*);
