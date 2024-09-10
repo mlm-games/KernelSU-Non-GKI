@@ -34,7 +34,7 @@ perform_cleanup() {
     
     if [ -d "$KERNEL_DIR/KernelSU" ]; then
         echo "[+] Removing KernelSU submodule..."
-        git submodule deinit "$KERNEL_DIR/KernelSU" || true
+        git submodule deinit -f "$KERNEL_DIR/KernelSU" || true
         rm -rf "$KERNEL_DIR/KernelSU" && echo "[-] KernelSU directory deleted."
 
         rm -rf "$KERNEL_DIR/.git/modules/KernelSU" || true
