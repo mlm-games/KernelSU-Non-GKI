@@ -14,9 +14,9 @@ on:
         required: true
         default: 'your_default_defconfig'
       repo_url:
-        description: 'Kernel repository URL'
+        description: 'Kernel repository URL (without https://github.com/)'
         required: true
-        default: 'https://github.com/mlm-games/android_kernel_lenovo_mt8765_P'
+        default: 'mlm-games/android_kernel_lenovo_mt8765_P'
       branch:
         description: 'Repository Branch'
         required: true
@@ -28,18 +28,6 @@ jobs:
     strategy:
       fail-fast: true
     steps:
-    - name: Remove unused packages
-      if: env.REMOVE_UNUSED_PACKAGES == 'true'
-      uses: jlumbroso/free-disk-space@main
-      with:
-        tool-cache: true
-        android: false
-        dotnet: true
-        haskell: true
-        large-packages: true
-        docker-images: true
-        swap-storage: false
-
     - name: Set swap to 10G
       uses: pierotofy/set-swap-space@master
       with:
@@ -48,7 +36,7 @@ jobs:
     - name: Checkout repo
       uses: actions/checkout@v4
       with:
-        repository: ${{ github.event.inputs.repo_url || 'https://github.com/mlm-games/android_kernel_lenovo_mt8765_P' }}
+        repository: ${{ github.event.inputs.repo_url || 'mlm-games/android_kernel_lenovo_mt8765_P' }}
         ref: ${{ github.event.inputs.branch || 'stock' }}
         fetch-depth: 1
         
@@ -63,7 +51,7 @@ jobs:
 
     - name: Download gcc
       run: |
-        git clone ../https://github.com/djb77/aarch64-linux-android-4.9
+        git clone https://github.com/djb77/aarch64-linux-android-4.9 ../aarch64-linux-android-4.9
 
     - name: Add ksu and build kernel using build_kernel.sh
       run: |
