@@ -1,30 +1,16 @@
 import os
 import re
 
-def modify_ksu_config(enable=True):
-    # Possible directories for defconfig
-    directories = [
-        "arch/arm64/configs",
-        "arch/arm64/configs/vendor"
-    ]
-
-    # Find the defconfig file
-    defconfig_path = None
-    for directory in directories:
-        for filename in os.listdir(directory):
-            if filename.endswith("_defconfig"):
-                defconfig_path = os.path.join(directory, filename)
-                break
-        if defconfig_path:
-            break
-
-    if not defconfig_path:
-        print("Error: Could not find defconfig file.")
-        return
-
+def modify_ksu_config(defconfig_path, enable=True):
     # Read the current content of the defconfig file
     with open(defconfig_path, 'r') as file:
         content = file.read()
+
+    # Check if CONFIG_KPROBES is enabled
+    kprobes_enabled = re.search(r'^CONFIG_KPROBES=y$', content, re.MULTILINE)
+    if not kprobes_enabled:
+        print(f"Error: CONFIG_KPROBES is not enabled in {defconfig_path}.")
+        return
 
     # Check if CONFIG_KSU is already present
     ksu_regex = re.compile(r'^CONFIG_KSU=.*$', re.MULTILINE)
@@ -235,6 +221,17 @@ def process_kernel_source(file_paths, enable_ksu=True, disable_external_mods=Fal
             print(f"Skipped {file_path} (not in ksu_calls)")
 
 def main():
+    # Parse command-line arguments
+    import argparse
+    parser = argparse.ArgumentParser(description='KernelSU integration script')
+    parser.add_argument('defconfig', help='Path to the defconfig file')
+    parser.add_argument('--disable-ksu', action='store_true', help='Disable KernelSU')
+    parser.add_argument('--disable-external-mods', action='store_true', help='Disable external modifications')
+    args = parser.parse_args()
+
+    # Modify KSU config based on the defconfig provided
+    modify_ksu_config(defconfig_path=args.defconfig, enable=not args.disable_ksu)
+
     # Define the paths to your kernel source files
     file_paths = [
         './fs/exec.c',
@@ -244,16 +241,6 @@ def main():
         './fs/devpts/inode.c',
         './drivers/input/input.c'
     ]
-
-    # Parse command-line arguments
-    import argparse
-    parser = argparse.ArgumentParser(description='KernelSU integration script')
-    parser.add_argument('--disable-ksu', action='store_true', help='Disable KernelSU')
-    parser.add_argument('--disable-external-mods', action='store_true', help='Disable external modifications')
-    args = parser.parse_args()
-
-    # Modify KSU config
-    modify_ksu_config(enable=not args.disable_ksu)
 
     # Process kernel source files
     process_kernel_source(file_paths, enable_ksu=not args.disable_ksu, disable_external_mods=args.disable_external_mods)

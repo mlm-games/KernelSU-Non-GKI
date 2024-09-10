@@ -38,6 +38,7 @@ perform_cleanup() {
         rm -rf "$KERNEL_DIR/KernelSU" && echo "[-] KernelSU directory deleted."
 
         rm -rf "$KERNEL_DIR/.git/modules/KernelSU" || true
+        git stage KernelSU
     fi
 }
 
