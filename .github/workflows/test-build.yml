@@ -16,24 +16,37 @@ jobs:
     strategy:
       fail-fast: true
     steps:
-      - name: kernel test source
-        run: |
-          git clone https://github.com/mlm-games/android_kernel_lenovo_mt8167s --depth=1
-          
-      - name: kernel build deps
-        run: |
-          sudo apt update
-          sudo apt install bison flex libssl-dev git python2.7
+    - name: Remove unused packages
+      if: env.REMOVE_UNUSED_PACKAGES == 'true'
+      uses: jlumbroso/free-disk-space@main
+      with:
+        tool-cache: ture
+        android: false
+        dotnet: true
+        haskell: true
+        large-packages: true
+        docker-images: true
+        swap-storage: false
 
-      - name: set up git
-        run: |
-          
+    - name: Set swap to 10G
+      uses: pierotofy/set-swap-space@master
+      with:
+        swap-size-gb: 10
+        
+    - name: Checkout kernel test source
+      run: |
+        git clone https://github.com/mlm-games/android_kernel_lenovo_mt8167s --depth=1
+        
+    - name: Kernel build deps
+      run: |
+        sudo apt update
+        sudo apt-get install git ccache automake flex lzop bison gperf build-essential zip curl zlib1g-dev g++-multilib libxml2-utils bzip2 libbz2-dev libbz2-1.0 libghc-bzlib-dev squashfs-tools pngcrush schedtool dpkg-dev liblz4-tool make optipng maven libssl-dev pwgen libswitch-perl policycoreutils minicom libxml-sax-base-perl libxml-simple-perl bc libc6-dev-i386 lib32ncurses5-dev libx11-dev lib32z-dev libgl1-mesa-dev xsltproc unzip device-tree-compiler python2 python3
 
-      - name: Download gcc
-        run: |
-          git clone https://github.com/djb77/aarch64-linux-android-4.9 ../aarch64-linux-android-4.9
+    - name: Download gcc
+      run: |
+        git clone https://github.com/djb77/aarch64-linux-android-4.9 ../aarch64-linux-android-4.9
 
-      - name: Build kernel using build_kernel.sh
-        run: |
-          cd android_kernel_lenovo_mt8167s
-          ./build_kernel.sh 
+    - name: Build kernel using build_kernel.sh
+      run: |
+        cd android_kernel_lenovo_mt8167s
+        ./build_kernel.sh 
