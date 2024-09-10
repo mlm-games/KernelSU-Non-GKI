@@ -1,9 +1,13 @@
 #!/bin/bash
 
 # Set variables
+# Absolute path to this script, e.g. /home/user/bin/foo.sh
+SCRIPT=$(readlink -f "$0")
+# Absolute path this script is in, thus /home/user/bin
+SCRIPT_PATH=$(dirname "$SCRIPT")
 ANYKERNEL_REPO="https://github.com/mlm-games/AnyKernel3.git"
-ANYKERNEL_DIR="AnyKernel3"
-KERNEL_SOURCE_DIR="../.."  # Replace with actual path if yours is diff.
+ANYKERNEL_DIR="$SCRIPT_PATH/../../AnyKernel3"
+KERNEL_SOURCE_DIR="$SCRIPT_PATH/../.."  # Replace with actual path if yours is diff.
 FINAL_KERNEL_ZIP="RuskKernel.zip"
 
 # Clone AnyKernel3 repository
