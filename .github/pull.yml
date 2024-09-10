@@ -1,0 +1,45 @@
+name: KernelSU Update
+
+on:
+  schedule:
+    - cron: '0 0 1 */2 *'  # Run at 00:00 on the 1st day of every 2nd month
+  workflow_dispatch:  # Allow manual triggering
+
+jobs:
+  update-kernelsu:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout main repository
+        uses: actions/checkout@v4
+
+      - name: Clone KernelSU repository
+        run: |
+          git clone https://github.com/tiann/KernelSU.git kernelsu_temp
+
+      - name: Check for changes and copy files
+        run: |
+          if [[ -d kernelsu_temp/kernel && "$(ls -A kernelsu_temp/kernel)" ]]; then
+            mkdir -p KernelSU/kernel
+            cp -R kernelsu_temp/kernel/* KernelSU/kernel/
+            if [[ -n $(git status -s) ]]; then
+              echo "CHANGES_MADE=true" >> $GITHUB_ENV
+            else
+              echo "No changes detected in KernelSU kernel files."
+              echo "CHANGES_MADE=false" >> $GITHUB_ENV
+            fi
+          else
+            echo "KernelSU kernel directory is empty or doesn't exist."
+            echo "CHANGES_MADE=false" >> $GITHUB_ENV
+          fi
+
+      - name: Push changes to branch
+        if: env.CHANGES_MADE == 'true'
+        run: |
+          git config user.name 'GitHub Action'
+          git config user.email 'action@github.com'
+          git checkout -b kernelsu-update
+          git add KernelSU/kernel
+          git commit -m "Update KernelSU kernel files - $(date +%Y%m%d)"
+          git push -f origin kernelsu-update
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
