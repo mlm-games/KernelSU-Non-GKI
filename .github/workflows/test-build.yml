@@ -45,11 +45,12 @@ jobs:
       with:
         swap-size-gb: 10
         
-    - name: Checkout kernel test source
-      run: |
-        REPO_NAME=$(basename ${{ github.event.inputs.repo_url || 'https://github.com/mlm-games/android_kernel_lenovo_mt8765_P' }} .git)
-        git clone ${{ github.event.inputs.repo_url || 'https://github.com/mlm-games/android_kernel_lenovo_mt8765_P' }} -b ${{ inputs.branch || 'stock' }} --depth=1
-        echo "REPO_NAME=$REPO_NAME" >> $GITHUB_ENV
+    - name: Checkout repo
+      uses: actions/checkout@v4
+      with:
+        repository: ${{ github.event.inputs.repo_url || 'https://github.com/mlm-games/android_kernel_lenovo_mt8765_P' }}
+        ref: ${{ github.event.inputs.branch || 'stock' }}
+        fetch-depth: 1
         
     - name: Kernel build deps
       run: |
@@ -62,11 +63,10 @@ jobs:
 
     - name: Download gcc
       run: |
-        git clone https://github.com/djb77/aarch64-linux-android-4.9
+        git clone ../https://github.com/djb77/aarch64-linux-android-4.9
 
     - name: Add ksu and build kernel using build_kernel.sh
       run: |
-        cd ${{ env.REPO_NAME }}
         curl -LSs "https://raw.githubusercontent.com/mlm-games/KernelSU-Non-GKI/main/kernel/setup-subm.sh" | bash -s 
         python3 KernelSU/scripts/integrate-no-kprobe.py ${{ github.event.inputs.defconfig || 'mt8765_P_defconfig' }}
         ./build_kernel.sh ${{ github.event.inputs.defconfig || 'mt8765_P_defconfig' }}
