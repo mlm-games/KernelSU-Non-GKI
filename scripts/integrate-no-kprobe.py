@@ -1,15 +1,35 @@
 import os
 import re
 
-def modify_ksu_config(defconfig_path, enable=True):
+def modify_ksu_config(defconfig, enable=True):
+    # Possible directories for defconfig
+    directories = [
+        "arch/arm64/configs",
+        "arch/arm64/configs/vendor"
+    ]
+
+    # Find the defconfig file
+    defconfig_path = None
+    for directory in directories:
+        for filename in os.listdir(directory):
+            if filename.endswith("_defconfig") and filename == defconfig:
+                defconfig_path = os.path.join(directory, filename)
+                break
+        if defconfig_path:
+            break
+
+    if not defconfig_path:
+        print("Error: Could not find defconfig file.")
+        return
+
     # Read the current content of the defconfig file
     with open(defconfig_path, 'r') as file:
         content = file.read()
 
     # Check if CONFIG_KPROBES is enabled
     kprobes_enabled = re.search(r'^CONFIG_KPROBES=y$', content, re.MULTILINE)
-    if not kprobes_enabled:
-        print(f"Error: CONFIG_KPROBES is not enabled in {defconfig_path}.")
+    if kprobes_enabled:
+        print(f"Error: CONFIG_KPROBES is enabled in {defconfig_path}. Follow the official docs foor kprobe integration.")
         return
 
     # Check if CONFIG_KSU is already present
@@ -230,7 +250,7 @@ def main():
     args = parser.parse_args()
 
     # Modify KSU config based on the defconfig provided
-    modify_ksu_config(defconfig_path=args.defconfig, enable=not args.disable_ksu)
+    modify_ksu_config(defconfig=args.defconfig, enable=not args.disable_ksu)
 
     # Define the paths to your kernel source files
     file_paths = [
