@@ -35,7 +35,7 @@ jobs:
         
     - name: Checkout kernel test source
       run: |
-        git clone https://github.com/mlm-games/android_kernel_lenovo_mt8167s --depth=1
+        git clone https://github.com/mlm-games/android_kernel_lenovo_mt8765_P -b stock --depth=1
         
     - name: Kernel build deps
       run: |
