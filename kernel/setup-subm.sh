@@ -47,7 +47,7 @@ setup_kernelsu() {
     test -d "$KERNEL_DIR/KernelSU" || git submodule add https://github.com/mlm-games/KernelSU-Non-GKI KernelSU
     git submodule update --init --recursive
 
-    ln -sfn "$(realpath --relative-to="$DRIVER_DIR" "$KERNEL_DIR/KernelSU/kernel")" "kernelsu" && echo "[+] Symlink to kernelsu created."
+    ln -sfn "$(realpath --relative-to="$DRIVER_DIR" "$KERNEL_DIR/KernelSU/kernel")" "$DRIVER_DIR/kernelsu" && echo "[+] Symlink to kernelsu created."
 
     # Later when i have tags
     # if [ -n "$1" ]; then
