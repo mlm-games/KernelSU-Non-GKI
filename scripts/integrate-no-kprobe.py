@@ -29,7 +29,7 @@ def modify_ksu_config(defconfig, enable=True):
     # Check if CONFIG_KPROBES is enabled
     kprobes_enabled = re.search(r'^CONFIG_KPROBES=y$', content, re.MULTILINE)
     if kprobes_enabled:
-        print(f"Error: CONFIG_KPROBES is enabled in {defconfig_path}. Follow the official docs foor kprobe integration.")
+        print(f"Error: CONFIG_KPROBES is enabled in {defconfig_path}. Follow the official docs for kprobe integration.")
         exit()
 
     # Check if CONFIG_KSU is already present
@@ -135,7 +135,7 @@ def process_kernel_source(file_paths, enable_ksu=True, disable_external_mods=Fal
         else:
             print(f"Skipped {file_path} (not in ksu_calls)")
 
-# KSU calls and extern declarations for each file
+# KSU calls for each file (extern declarations removed, present in header file)
 ksu_calls = {
     'exec.c': {
         'functions': ['do_execveat_common'],
@@ -144,57 +144,35 @@ ksu_calls = {
                ksu_handle_execveat(&fd, &filename, &argv, &envp, &flags);
        else
                ksu_handle_execveat_sucompat(&fd, &filename, &argv, &envp, &flags);
-   #endif''',
-        'extern': '''#ifdef CONFIG_KSU
-extern bool ksu_execveat_hook __read_mostly;
-extern int ksu_handle_execveat(int *fd, struct filename **filename_ptr, void *argv,
-                       void *envp, int *flags);
-extern int ksu_handle_execveat_sucompat(int *fd, struct filename **filename_ptr,
-                                void *argv, void *envp, int *flags);
-#endif'''
+   #endif'''
     },
     'open.c': {
         'functions': ['do_faccessat', 'SYSCALL_DEFINE3(faccessat,'],
         'code': '''   #ifdef CONFIG_KSU
        if (unlikely(ksu_faccessat_hook))
                ksu_handle_faccessat(&dfd, &filename, &mode, &flags);
-   #endif''',
-        'extern': '''#ifdef CONFIG_KSU
-extern bool ksu_faccessat_hook __read_mostly;
-extern int ksu_handle_faccessat(int *dfd, const char __user **filename_user, int *mode, int *flags);
-#endif'''
+   #endif'''
     },
     'read_write.c': {
         'functions': ['vfs_read'],
         'code': '''   #ifdef CONFIG_KSU
        if (unlikely(ksu_vfs_read_hook))
                ksu_handle_vfs_read(file, buf, count, pos);
-   #endif''',
-        'extern': '''#ifdef CONFIG_KSU
-extern bool ksu_vfs_read_hook __read_mostly;
-extern int ksu_handle_vfs_read(struct file *file, char __user *buf, size_t count, loff_t *pos);
-#endif'''
+   #endif'''
     },
-'stat.c': {
+    'stat.c': {
         'functions': ['vfs_statx', 'vfs_fstatat'],
         'code': '''   #ifdef CONFIG_KSU
        if (unlikely(ksu_vfs_stat_hook))
                ksu_handle_vfs_stat(dfd, filename, &stat, flags);
-   #endif''',
-        'extern': '''#ifdef CONFIG_KSU
-extern bool ksu_vfs_stat_hook __read_mostly;
-extern int ksu_handle_vfs_stat(int dfd, const char __user *filename, struct kstat *stat, int flags);
-#endif'''
+   #endif'''
     },
     # External modifications
     'inode.c': {
         'functions': ['*devpts_get_priv'],
         'code': '''   #ifdef CONFIG_KSU
        ksu_handle_devpts(dentry->d_inode);
-   #endif''',
-        'extern': '''#ifdef CONFIG_KSU
-extern int ksu_handle_devpts(struct inode *inode);
-#endif'''
+   #endif'''
     },
     'namespace.c': {
         'functions': ['path_umount'],
@@ -202,21 +180,14 @@ extern int ksu_handle_devpts(struct inode *inode);
        ret = ksu_handle_path_umount(path, flags);
        if (ret)
            return ret;
-   #endif''',
-        'extern': '''#ifdef CONFIG_KSU
-extern int ksu_handle_path_umount(struct path *path, int flags);
-#endif'''
+   #endif'''
     },
     'input.c': {
         'functions': ['input_handle_event'],
         'code': '''   #ifdef CONFIG_KSU
        if (unlikely(ksu_input_hook))
            ksu_handle_input_handle_event(&type, &code, &value);
-   #endif''',
-        'extern': '''#ifdef CONFIG_KSU
-extern bool ksu_input_hook __read_mostly;
-extern int ksu_handle_input_handle_event(unsigned int *type, unsigned int *code, int *value);
-#endif'''
+   #endif'''
     }
 }
 
