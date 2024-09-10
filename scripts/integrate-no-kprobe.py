@@ -174,14 +174,6 @@ ksu_calls = {
        ksu_handle_devpts(dentry->d_inode);
    #endif'''
     },
-    'namespace.c': {
-        'functions': ['path_umount'],
-        'code': '''   #ifdef CONFIG_KSU
-       ret = ksu_handle_path_umount(path, flags);
-       if (ret)
-           return ret;
-   #endif'''
-    },
     'input.c': {
         'functions': ['input_handle_event'],
         'code': '''   #ifdef CONFIG_KSU
