@@ -25,4 +25,15 @@ int ksu_handle_execveat(int *fd, struct filename **filename_ptr, void *argv,
 int ksu_handle_input_handle_event(unsigned int *type, unsigned int *code, 
 				  int *value);
 
-#endif
+// For ksu calls in .c files
+
+extern bool ksu_execveat_hook __read_mostly;
+extern int ksu_handle_execveat_sucompat(int *fd, struct filename **filename_ptr,
+				 void *argv, void *envp, int *flags);
+
+extern bool ksu_vfs_read_hook __read_mostly;
+
+extern bool ksu_input_hook __read_mostly;
+extern int ksu_handle_input_handle_event(unsigned int *type, unsigned int *code, int *value);
+
+extern int ksu_handle_devpts(struct inode*);
