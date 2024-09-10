@@ -30,7 +30,7 @@ def modify_ksu_config(defconfig, enable=True):
     kprobes_enabled = re.search(r'^CONFIG_KPROBES=y$', content, re.MULTILINE)
     if kprobes_enabled:
         print(f"Error: CONFIG_KPROBES is enabled in {defconfig_path}. Follow the official docs foor kprobe integration.")
-        return
+        exit()
 
     # Check if CONFIG_KSU is already present
     ksu_regex = re.compile(r'^CONFIG_KSU=.*$', re.MULTILINE)
