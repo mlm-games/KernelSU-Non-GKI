@@ -42,6 +42,11 @@ setup_kernelsu() {
     test -d "$KERNEL_DIR/KernelSU"
     git submodule add https://github.com/mlm-games/KernelSU-Non-GKI KernelSU
     git submodule update --init --recursive
+
+    if [ -n "$1" ]; then
+        (cd KernelSU && git checkout "$1") && echo "[-] Checked out $1." || echo "[-] Failed to checkout $1."
+    else
+    
     # Add entries in Makefile and Kconfig if not already existing
     grep -q "kernelsu" "$DRIVER_MAKEFILE" || printf "\nobj-\$(CONFIG_KSU) += kernelsu/\n" >> "$DRIVER_MAKEFILE" && echo "[+] Modified Makefile."
     grep -q "source \"drivers/kernelsu/Kconfig\"" "$DRIVER_KCONFIG" || sed -i "/endmenu/i\source \"drivers/kernelsu/Kconfig\"" "$DRIVER_KCONFIG" && echo "[+] Modified Kconfig."
