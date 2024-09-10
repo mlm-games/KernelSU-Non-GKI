@@ -14,7 +14,8 @@ Then, For adding the ksu modifications in the .c files, For whichever defconfig 
 python3 KernelSU/scripts/integrate-no-kprobe.py <__your_defconfig__>
 ```
 
-Other usage cases:
+### Other usage cases:
+
 If you want to disable KernelSU in your defconfig:
 ```
 python3 KernelSU/scripts/integrate-no-kprobe.py some_random_defconfig --disable-ksu
