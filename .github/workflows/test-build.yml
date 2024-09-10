@@ -1,0 +1,38 @@
+name: Test build kernel
+
+on:
+  push:
+    branches:
+      main
+  pull_request:
+    branches:
+      main
+  workflow_dispatch:
+
+  
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: true
+    steps:
+      - name: kernel test source
+        run: |
+          git clone https://github.com/mlm-games/android_kernel_lenovo_mt8167s --depth=1
+
+      - name: kernel build deps
+        run: |
+          sudo apt update
+          sudo apt install bison flex libssl-dev git python2.7
+
+      - name: set up git
+        run: |
+          
+
+      - name: Download gcc
+        run: |
+          git clone https://github.com/djb77/aarch64-linux-android-4.9 ../aarch64-linux-android-4.9
+
+      - name: Build kernel using build_kernel.sh
+        run: |
+          ./build_kernel.sh 
