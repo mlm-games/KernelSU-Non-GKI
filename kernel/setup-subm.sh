@@ -25,13 +25,16 @@ initialize_variables() {
     DRIVER_KCONFIG=$DRIVER_DIR/Kconfig
 }
 
-# Reverts modifications made by this script
+# Reverts modifications made by this script, remove the submodule.
 perform_cleanup() {
     echo "[+] Cleaning up..."
     [ -L "$DRIVER_DIR/kernelsu" ] && rm "$DRIVER_DIR/kernelsu" && echo "[-] Symlink removed."
     grep -q "kernelsu" "$DRIVER_MAKEFILE" && sed -i '/kernelsu/d' "$DRIVER_MAKEFILE" && echo "[-] Makefile reverted."
     grep -q "drivers/kernelsu/Kconfig" "$DRIVER_KCONFIG" && sed -i '/drivers\/kernelsu\/Kconfig/d' "$DRIVER_KCONFIG" && echo "[-] Kconfig reverted."
+    
     if [ -d "$KERNEL_DIR/KernelSU" ]; then
+        git submodule deinit -f -- "$KERNEL_DIR/KernelSU"
+        rm -rf "$KERNEL_DIR/.git/modules/KernelSU"
         rm -rf "$KERNEL_DIR/KernelSU" && echo "[-] KernelSU directory deleted."
     fi
 }
