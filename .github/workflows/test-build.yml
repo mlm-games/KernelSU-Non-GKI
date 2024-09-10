@@ -19,7 +19,7 @@ jobs:
       - name: kernel test source
         run: |
           git clone https://github.com/mlm-games/android_kernel_lenovo_mt8167s --depth=1
-
+          
       - name: kernel build deps
         run: |
           sudo apt update
@@ -35,4 +35,5 @@ jobs:
 
       - name: Build kernel using build_kernel.sh
         run: |
+          cd android_kernel_lenovo_mt8167s
           ./build_kernel.sh 
