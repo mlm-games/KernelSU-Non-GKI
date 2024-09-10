@@ -48,7 +48,7 @@ jobs:
     - name: Checkout kernel test source
       run: |
         REPO_NAME=$(basename ${{ github.event.inputs.repo_url }} .git)
-        git clone ${{ github.event.inputs.repo_url || 'https://github.com/mlm-games/android_kernel_lenovo_mt8765_P' }} -b ${{ inputs.branch }} --depth=1
+        git clone ${{ github.event.inputs.repo_url || 'https://github.com/mlm-games/android_kernel_lenovo_mt8765_P' }} -b ${{ inputs.branch || 'stock' }} --depth=1
         echo "REPO_NAME=$REPO_NAME" >> $GITHUB_ENV
         
     - name: Kernel build deps
@@ -62,7 +62,7 @@ jobs:
 
     - name: Add ksu and build kernel using build_kernel.sh
       run: |
-        cd $REPO_NAME
+        cd ${{ env.REPO_NAME }}
         curl -LSs "https://raw.githubusercontent.com/mlm-games/KernelSU-Non-GKI/main/kernel/setup-subm.sh" | bash -s 
         python3 KernelSU/scripts/integrate-no-kprobe.py ${{ github.event.inputs.defconfig || 'your_default_defconfig' }}
         ./build_kernel.sh
