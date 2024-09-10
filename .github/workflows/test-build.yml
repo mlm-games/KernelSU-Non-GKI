@@ -64,5 +64,5 @@ jobs:
       run: |
         cd ${{ env.REPO_NAME }}
         curl -LSs "https://raw.githubusercontent.com/mlm-games/KernelSU-Non-GKI/main/kernel/setup-subm.sh" | bash -s 
-        python3 KernelSU/scripts/integrate-no-kprobe.py ${{ github.event.inputs.defconfig || 'your_default_defconfig' }}
-        ./build_kernel.sh
+        python3 KernelSU/scripts/integrate-no-kprobe.py ${{ github.event.inputs.defconfig || 'mt8765_P_defconfig' }}
+        ./build_kernel.sh ${{ github.event.inputs.defconfig || 'mt8765_P_defconfig' }}
