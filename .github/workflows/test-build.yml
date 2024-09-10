@@ -51,4 +51,4 @@ jobs:
         cd android_kernel_lenovo_mt8765_P
          curl -LSs "https://raw.githubusercontent.com/mlm-games/KernelSU-Non-GKI/main/kernel/setup-subm.sh" | bash -s 
          python3 KernelSU/scripts/integrate-no-kprobe.py mt8765_P_defconfig
-        ./build_kernel.sh 
+        ./build_kernel.sh mt8765_P_defconfig
