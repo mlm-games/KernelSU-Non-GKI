@@ -1,7 +1,0 @@
-version: "1"
-rules:
-  - base: main
-    upstream: tiann:main
-    mergeMethod: merge
-    patterns:
-      - include: kernel/**
