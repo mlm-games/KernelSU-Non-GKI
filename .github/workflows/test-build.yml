@@ -47,7 +47,7 @@ jobs:
         
     - name: Checkout kernel test source
       run: |
-        REPO_NAME=$(basename ${{ github.event.inputs.repo_url }} .git)
+        REPO_NAME=$(basename ${{ github.event.inputs.repo_url || 'https://github.com/mlm-games/android_kernel_lenovo_mt8765_P' }} .git)
         git clone ${{ github.event.inputs.repo_url || 'https://github.com/mlm-games/android_kernel_lenovo_mt8765_P' }} -b ${{ inputs.branch || 'stock' }} --depth=1
         echo "REPO_NAME=$REPO_NAME" >> $GITHUB_ENV
         
