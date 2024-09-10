@@ -44,7 +44,7 @@ jobs:
 
     - name: Download gcc
       run: |
-        git clone https://github.com/djb77/aarch64-linux-android-4.9 ../aarch64-linux-android-4.9
+        git clone https://github.com/djb77/aarch64-linux-android-4.9
 
     - name: Build kernel using build_kernel.sh
       run: |
