@@ -3,13 +3,25 @@ name: Test build kernel for 4.4-mtk
 on:
   push:
     branches:
-      main
+      - main
   pull_request:
     branches:
-      main
+      - main
   workflow_dispatch:
+    inputs:
+      defconfig:
+        description: 'Defconfig file name'
+        required: true
+        default: 'your_default_defconfig'
+      repo_url:
+        description: 'Kernel repository URL'
+        required: true
+        default: 'https://github.com/mlm-games/android_kernel_lenovo_mt8765_P'
+      branch:
+        description: 'Repository Branch'
+        required: true
+        default: 'stock'
 
-  
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -20,7 +32,7 @@ jobs:
       if: env.REMOVE_UNUSED_PACKAGES == 'true'
       uses: jlumbroso/free-disk-space@main
       with:
-        tool-cache: ture
+        tool-cache: true
         android: false
         dotnet: true
         haskell: true
@@ -35,7 +47,9 @@ jobs:
         
     - name: Checkout kernel test source
       run: |
-        git clone https://github.com/mlm-games/android_kernel_lenovo_mt8765_P -b stock --depth=1
+        REPO_NAME=$(basename ${{ github.event.inputs.repo_url }} .git)
+        git clone ${{ github.event.inputs.repo_url || 'https://github.com/mlm-games/android_kernel_lenovo_mt8765_P' }} -b ${{ inputs.branch }} --depth=1
+        echo "REPO_NAME=$REPO_NAME" >> $GITHUB_ENV
         
     - name: Kernel build deps
       run: |
@@ -48,7 +62,7 @@ jobs:
 
     - name: Add ksu and build kernel using build_kernel.sh
       run: |
-        cd android_kernel_lenovo_mt8765_P
-         curl -LSs "https://raw.githubusercontent.com/mlm-games/KernelSU-Non-GKI/main/kernel/setup-subm.sh" | bash -s 
-         python3 KernelSU/scripts/integrate-no-kprobe.py mt8765_P_defconfig
-        ./build_kernel.sh mt8765_P_defconfig
+        cd $REPO_NAME
+        curl -LSs "https://raw.githubusercontent.com/mlm-games/KernelSU-Non-GKI/main/kernel/setup-subm.sh" | bash -s 
+        python3 KernelSU/scripts/integrate-no-kprobe.py ${{ github.event.inputs.defconfig || 'your_default_defconfig' }}
+        ./build_kernel.sh
