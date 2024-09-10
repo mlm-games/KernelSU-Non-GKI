@@ -38,26 +38,60 @@ perform_cleanup() {
 
 # Sets up or update KernelSU environment
 setup_kernelsu() {
-    echo "[+] Setting up KernelSU..."
-    test -d "$GKI_ROOT/KernelSU" || git clone https://github.com/mlm-games/KernelSU-Non-GKI KernelSU && echo "[+] Repository cloned."
-    cd "$GKI_ROOT/KernelSU"
-    git stash && echo "[-] Stashed current changes."
-    if [ "$(git status | grep -Po 'v\d+(\.\d+)*' | head -n1)" ]; then
-        git checkout main && echo "[-] Switched to main branch."
-    fi
-    git pull && echo "[+] Repository updated."
-    if [ -z "${1-}" ]; then
-        git checkout "$(git describe --abbrev=0 --tags)" && echo "[-] Checked out latest tag."
-    else
-        git checkout "$1" && echo "[-] Checked out $1." || echo "[-] Checkout default branch"
-    fi
-    cd "$DRIVER_DIR"
-    ln -sf "$(realpath --relative-to="$DRIVER_DIR" "$GKI_ROOT/KernelSU/kernel")" "kernelsu" && echo "[+] Symlink created."
+    local ksu_dir="$GKI_ROOT/KernelSU"
+    local current_tag
 
-    # Add entries in Makefile and Kconfig if not already existing
-    grep -q "kernelsu" "$DRIVER_MAKEFILE" || printf "\nobj-\$(CONFIG_KSU) += kernelsu/\n" >> "$DRIVER_MAKEFILE" && echo "[+] Modified Makefile."
-    grep -q "source \"drivers/kernelsu/Kconfig\"" "$DRIVER_KCONFIG" || sed -i "/endmenu/i\source \"drivers/kernelsu/Kconfig\"" "$DRIVER_KCONFIG" && echo "[+] Modified Kconfig."
-    echo '[+] Done.'
+    echo "[+] Setting up KernelSU environment..."
+
+    # Clone KernelSU if it doesn't exist
+    if [[ ! -d "$ksu_dir" ]]; then
+        git clone https://github.com/mlm-games/KernelSU-Non-GKI "$ksu_dir" || { echo "[-] Failed to clone KernelSU repository."; return 1; }
+        echo "[+] KernelSU repository cloned."
+    fi
+
+    cd "$ksu_dir" || { echo "[-] Unable to change directory to $ksu_dir"; return 1; }
+
+    # Stash any local changes
+    git stash 2>/dev/null && echo "[-] Stashed current changes."
+
+    # Ensure we're on the main branch or a tagged version
+    if git rev-parse --is-inside-work-tree > /dev/null 2>&1; then
+        current_tag=$(git describe --tags --exact-match 2>/dev/null)
+        if [[ -z "$current_tag" ]]; then
+            git checkout main && echo "[-] Switched to main branch."
+        fi
+    else
+        echo "[-] Not in a git repository, skipping branch check."
+    fi
+
+    # Pull the latest changes
+    git pull --ff-only && echo "[+] Updated repository." || { echo "[-] Failed to update repository."; return 1; }
+
+    # Checkout to the specified or latest tag
+    if [[ -z "${1-}" ]]; then
+        git checkout $(git describe --tags $(git rev-list --tags --max-count=1)) && echo "[-] Checked out latest tag."
+    else
+        git checkout "$1" 2>/dev/null && echo "[-] Checked out $1." || { echo "[-] Failed to checkout $1, staying on current branch/tag."; }
+    fi
+
+    # Return to the driver directory
+    cd "$DRIVER_DIR" || { echo "[-] Unable to return to $DRIVER_DIR"; return 1; }
+
+    # Create symlink
+    ln -sfn "$(realpath --relative-to="$DRIVER_DIR" "$ksu_dir/kernel")" "kernelsu" && echo "[+] Symlink to kernelsu created."
+
+    # Modify Makefile if necessary
+    if ! grep -q "kernelsu" "$DRIVER_MAKEFILE"; then
+        echo -e "\nobj-\$(CONFIG_KSU) += kernelsu/\n" >> "$DRIVER_MAKEFILE"
+        echo "[+] Added kernelsu to Makefile."
+    fi
+
+    # Modify Kconfig if necessary
+    if ! grep -q "source \"drivers/kernelsu/Kconfig\"" "$DRIVER_KCONFIG"; then
+        sed -i '/endmenu/i\source "drivers/kernelsu/Kconfig"' "$DRIVER_KCONFIG" && echo "[+] Added kernelsu to Kconfig."
+    fi
+
+    echo '[+] KernelSU setup completed.'
 }
 
 # Process command-line arguments
