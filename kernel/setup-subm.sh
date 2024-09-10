@@ -33,8 +33,9 @@ perform_cleanup() {
     grep -q "drivers/kernelsu/Kconfig" "$DRIVER_KCONFIG" && sed -i '/drivers\/kernelsu\/Kconfig/d' "$DRIVER_KCONFIG" && echo "[-] Kconfig reverted."
     
     if [ -d "$KERNEL_DIR/KernelSU" ]; then
-        git submodule deinit -f -- "$KERNEL_DIR/KernelSU"
-        rm -rf "$KERNEL_DIR/.git/modules/KernelSU"
+        echo "[+] Removing KernelSU submodule..."
+        git submodule deinit -f -- "$KERNEL_DIR/KernelSU" || true
+        rm -rf "$KERNEL_DIR/.git/modules/KernelSU" || true
         rm -rf "$KERNEL_DIR/KernelSU" && echo "[-] KernelSU directory deleted."
     fi
 }
