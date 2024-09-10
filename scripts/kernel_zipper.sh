@@ -5,9 +5,10 @@
 SCRIPT=$(readlink -f "$0")
 # Absolute path this script is in, thus /home/user/bin
 SCRIPT_PATH=$(dirname "$SCRIPT")
+
 ANYKERNEL_REPO="https://github.com/mlm-games/AnyKernel3.git"
 ANYKERNEL_DIR="$SCRIPT_PATH/../../AnyKernel3"
-KERNEL_SOURCE_DIR="$SCRIPT_PATH/../.."  # Replace with actual path if yours is diff.
+KERNEL_DIR="$SCRIPT_PATH/../.."  # Replace with actual path if yours is diff.
 FINAL_KERNEL_ZIP="RuskKernel.zip"
 
 # Clone AnyKernel3 repository
@@ -59,5 +60,7 @@ find_and_copy_dtb_dtbo
 # Create AnyKernel zip
 cd "$ANYKERNEL_DIR"
 zip -r9 "$FINAL_KERNEL_ZIP" * -x .git README.md *placeholder
+
+mv $FINAL_KERNEL_ZIP $KERNEL_DIR/$FINAL_KERNEL_ZIP
 
 echo "AnyKernel zip created: $FINAL_KERNEL_ZIP"
