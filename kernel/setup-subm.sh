@@ -34,9 +34,10 @@ perform_cleanup() {
     
     if [ -d "$KERNEL_DIR/KernelSU" ]; then
         echo "[+] Removing KernelSU submodule..."
-        git submodule deinit -f -- "$KERNEL_DIR/KernelSU" || true
-        rm -rf "$KERNEL_DIR/.git/modules/KernelSU" || true
+        git submodule deinit "$KERNEL_DIR/KernelSU" || true
         rm -rf "$KERNEL_DIR/KernelSU" && echo "[-] KernelSU directory deleted."
+
+        rm -rf "$KERNEL_DIR/.git/modules/KernelSU" || true
     fi
 }
 
@@ -46,9 +47,10 @@ setup_kernelsu() {
     test -d "$KERNEL_DIR/KernelSU" || git submodule add https://github.com/mlm-games/KernelSU-Non-GKI KernelSU
     git submodule update --init --recursive
 
-    if [ -n "$1" ]; then
-        (cd KernelSU && git checkout "$1") && echo "[-] Checked out $1." || echo "[-] Failed to checkout $1."
-    fi
+    # Later when i have tags
+    # if [ -n "$1" ]; then
+    #     (cd KernelSU && git checkout "$1") && echo "[-] Checked out $1." || echo "[-] Failed to checkout $1."
+    # fi
     
     # Add entries in Makefile and Kconfig if not already existing
     grep -q "kernelsu" "$DRIVER_MAKEFILE" || printf "\nobj-\$(CONFIG_KSU) += kernelsu/\n" >> "$DRIVER_MAKEFILE" && echo "[+] Modified Makefile."
