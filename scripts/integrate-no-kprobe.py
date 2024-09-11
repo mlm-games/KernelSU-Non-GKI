@@ -170,7 +170,6 @@ ksu_calls = {
             ksu_handle_stat(&dfd, &filename, &flag);
     #endif'''
     },
-    },
     # External modifications
     'inode.c': {
         'functions': ['*devpts_get_priv'],
