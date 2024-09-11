@@ -149,23 +149,26 @@ ksu_calls = {
     'open.c': {
         'functions': ['do_faccessat', 'SYSCALL_DEFINE3(faccessat,'],
         'code': '''   #ifdef CONFIG_KSU
-       if (unlikely(ksu_faccessat_hook))
-               ksu_handle_faccessat(&dfd, &filename, &mode, &flags);
+            ksu_handle_faccessat(&dfd, &filename, &mode, NULL);
    #endif'''
     },
     'read_write.c': {
         'functions': ['vfs_read'],
         'code': '''   #ifdef CONFIG_KSU
        if (unlikely(ksu_vfs_read_hook))
-               ksu_handle_vfs_read(file, buf, count, pos);
+               ksu_handle_vfs_read(&file, &buf, &count, &pos);
    #endif'''
     },
     'stat.c': {
         'functions': ['vfs_statx', 'vfs_fstatat'],
         'code': '''   #ifdef CONFIG_KSU
-       if (unlikely(ksu_vfs_stat_hook))
-               ksu_handle_vfs_stat(dfd, filename, &stat, flags);
-   #endif'''
+        if (unlikely(ksu_vfs_stat_hook)) {
+            if (strcmp(__func__, "vfs_statx") == 0)
+                ksu_handle_stat(&dfd, &filename, &flags);
+            else if (strcmp(__func__, "vfs_fstatat") == 0)
+                ksu_handle_stat(&dfd, &filename, &flag);
+        }
+    #endif'''
     },
     # External modifications
     'inode.c': {

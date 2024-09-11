@@ -88,7 +88,7 @@ fi
 
 # Create AnyKernel zip
 cd "$ANYKERNEL_DIR"
-zip -r9 "$FINAL_KERNEL_ZIP" * -x .git README.md *placeholder
+zip -r9 "$FINAL_KERNEL_ZIP" * -x .git README.md kernel_zipper.sh *placeholder
 
 mv $FINAL_KERNEL_ZIP $KERNEL_DIR/$FINAL_KERNEL_ZIP
 
