@@ -99,6 +99,10 @@ def add_ksu_calls(file_path, function_names, ksu_code, disable_external_mods=Fal
         
         if if_match:
             insert_pos = match.end() + if_match.start()
+
+            # One letter difference
+            if function_name == 'vfs_statx':
+                ksu_code = ksu_code.replace('&flag', '&flags')
             
             # Insert KSU code before the first 'if' statement
             if not disable_external_mods or file_path.endswith(('exec.c', 'open.c', 'read_write.c', 'stat.c')):
@@ -162,13 +166,10 @@ ksu_calls = {
     'stat.c': {
         'functions': ['vfs_statx', 'vfs_fstatat'],
         'code': '''   #ifdef CONFIG_KSU
-        if (unlikely(ksu_vfs_stat_hook)) {
-            if (strcmp(__func__, "vfs_statx") == 0)
-                ksu_handle_stat(&dfd, &filename, &flags);
-            else if (strcmp(__func__, "vfs_fstatat") == 0)
-                ksu_handle_stat(&dfd, &filename, &flag);
-        }
+        if (unlikely(ksu_vfs_stat_hook))
+            ksu_handle_stat(&dfd, &filename, &flag);
     #endif'''
+    },
     },
     # External modifications
     'inode.c': {
