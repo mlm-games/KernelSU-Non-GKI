@@ -27,9 +27,9 @@ python3 KernelSU/scripts/integrate-no-kprobe.py your_defconfig --disable-externa
 
 This script that makes an AnyKernel3 package and allows you to specify the DTB and DTBO files using the --dtb=filepath and --dtbo=filepath flags. For example:
 ```
-./kernel_zipper.sh --dtb=path/to/dtb/file.dtb --dtbo=path/to/dtbo/file.dtbo
+./KernelSU/scripts/kernel_zipper.sh --dtb=path/to/dtb/file.dtb --dtbo=path/to/dtbo/file.dtbo
 ```
-Just basic ```./kernel_zipper.sh``` will copy only the kernel Image. (searches in out/arch/arm(64)/boot and arch/arm(64)/boot for zImage-dtb Image.gz-dtb Image ... in descending order and stops after copying one kernel image)
+Just basic ```./KernelSU/scripts/kernel_zipper.sh``` will copy only the kernel Image. (searches in out/arch/arm(64)/boot and arch/arm(64)/boot for zImage-dtb Image.gz-dtb Image ... in descending order and stops after copying one kernel image)
 
 If you want to build your kernel entirely online with custom gcc or clang, checkout [kernelsu_build_action](https://github.com/xiaoleGun/KernelSU_Action/)
 ## Credits
