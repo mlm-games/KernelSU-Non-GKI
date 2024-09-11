@@ -26,7 +26,7 @@ while [[ $# -gt 0 ]]; do
             shift
             ;;
         --kernel=*)
-            DTBO_FILE="${1#*=}"
+            KERNEL_FILE="${1#*=}"
             shift
             ;;
         *)
