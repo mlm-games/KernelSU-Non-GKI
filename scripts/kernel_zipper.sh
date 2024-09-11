@@ -39,7 +39,7 @@ done
 # Clone AnyKernel3 repository
 
 if [ -d "$ANYKERNEL_DIR" ]; then
-    rm -rf $ANYKERNEL_DIR"
+    rm -rf $ANYKERNEL_DIR
 fi
 
 git clone "$ANYKERNEL_REPO" "$ANYKERNEL_DIR" --depth=1
