@@ -12,6 +12,7 @@ FINAL_KERNEL_ZIP="RuskKernel.zip"
 # Initialize variables
 DTB_FILE=""
 DTBO_FILE=""
+KERNEL_FILE=""
 
 # Parse command line arguments
 while [[ $# -gt 0 ]]; do
@@ -24,8 +25,12 @@ while [[ $# -gt 0 ]]; do
             DTBO_FILE="${1#*=}"
             shift
             ;;
+        --kernel=*)
+            DTBO_FILE="${1#*=}"
+            shift
+            ;;
         *)
-            echo "Unknown option: $1"
+            echo "Unknown option: $1" (Available -- options: kernel, dtb, dtbo)
             exit 1
             ;;
     esac
@@ -38,8 +43,18 @@ git clone "$ANYKERNEL_REPO" "$ANYKERNEL_DIR" --depth=1
 find_and_copy_kernel() {
     local search_dirs=("arch/arm/boot" "arch/arm64/boot" "out/arch/arm/boot" "out/arch/arm64/boot")
     local kernel_names=("zImage-dtb" "Image.gz-dtb" "Image.gz"  "Image" "kernel")
+    
+    if [ -f "$KERNEL_FILE" ]; then
+        cp "$KERNEL_FILE" "$ANYKERNEL_DIR/"
+        echo "Copied kernel: $dir/$KERNEL_FILE"
+        return 0
 
     for dir in "${search_dirs[@]}"; do
+        if [ -f "$KERNEL_DIR/$dir/$KERNEL_FILE" ]; then
+            cp "$KERNEL_DIR/$dir/$KERNEL_FILE" "$ANYKERNEL_DIR/"
+            echo "Copied kernel: $dir/$KERNEL_FILE"
+            return 0
+            
         for name in "${kernel_names[@]}"; do
             if [ -f "$KERNEL_DIR/$dir/$name" ]; then
                 cp "$KERNEL_DIR/$dir/$name" "$ANYKERNEL_DIR/"
