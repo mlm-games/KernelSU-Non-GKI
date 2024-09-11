@@ -60,6 +60,7 @@ copy_dtb() {
         echo "Copied DTB: $DTB_FILE"
     else
         echo "DTB file not found: $DTB_FILE"
+        exit
     fi
 }
 
@@ -70,6 +71,7 @@ copy_dtbo() {
         echo "Copied DTBO: $DTBO_FILE"
     else
         echo "DTBO file not found: $DTBO_FILE"
+        exit
     fi
 }
 
