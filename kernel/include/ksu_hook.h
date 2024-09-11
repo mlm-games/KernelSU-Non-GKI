@@ -36,3 +36,4 @@ extern bool ksu_vfs_read_hook __read_mostly;
 extern bool ksu_input_hook __read_mostly;
 
 extern int ksu_handle_devpts(struct inode*);
+#endif
