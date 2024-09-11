@@ -40,6 +40,8 @@ perform_cleanup() {
         rm -rf "$KERNEL_DIR/.git/modules/KernelSU" || true
         git stage KernelSU
     fi
+    # If u had manually deleted the KernelSU directory
+    rm -rf "$KERNEL_DIR/.git/modules/KernelSU" || true
 }
 
 # Sets up or update KernelSU environment
