@@ -48,12 +48,14 @@ find_and_copy_kernel() {
         cp "$KERNEL_FILE" "$ANYKERNEL_DIR/"
         echo "Copied kernel: $dir/$KERNEL_FILE"
         return 0
+    fi
 
     for dir in "${search_dirs[@]}"; do
         if [ -f "$KERNEL_DIR/$dir/$KERNEL_FILE" ]; then
             cp "$KERNEL_DIR/$dir/$KERNEL_FILE" "$ANYKERNEL_DIR/"
             echo "Copied kernel: $dir/$KERNEL_FILE"
             return 0
+        fi
             
         for name in "${kernel_names[@]}"; do
             if [ -f "$KERNEL_DIR/$dir/$name" ]; then
