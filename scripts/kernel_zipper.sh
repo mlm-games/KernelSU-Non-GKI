@@ -1,15 +1,35 @@
 #!/bin/bash
 
 # Set variables
-# Absolute path to this script, e.g. /home/user/bin/foo.sh
 SCRIPT=$(readlink -f "$0")
-# Absolute path this script is in, thus /home/user/bin
 SCRIPT_PATH=$(dirname "$SCRIPT")
 
 ANYKERNEL_REPO="https://github.com/mlm-games/AnyKernel3.git"
 ANYKERNEL_DIR="$SCRIPT_PATH/../../AnyKernel3"
-KERNEL_DIR="$SCRIPT_PATH/../.."  # Replace with actual path if yours is diff.
+KERNEL_DIR="$SCRIPT_PATH/../.."  # Replace with actual path if yours is different
 FINAL_KERNEL_ZIP="RuskKernel.zip"
+
+# Initialize variables
+DTB_FILE=""
+DTBO_FILE=""
+
+# Parse command line arguments
+while [[ $# -gt 0 ]]; do
+    case $1 in
+        --dtb=*)
+            DTB_FILE="${1#*=}"
+            shift
+            ;;
+        --dtbo=*)
+            DTBO_FILE="${1#*=}"
+            shift
+            ;;
+        *)
+            echo "Unknown option: $1"
+            exit 1
+            ;;
+    esac
+done
 
 # Clone AnyKernel3 repository
 git clone "$ANYKERNEL_REPO" "$ANYKERNEL_DIR" --depth=1
@@ -33,29 +53,36 @@ find_and_copy_kernel() {
     return 1
 }
 
-# Function to find and copy DTB/DTBO
-find_and_copy_dtb_dtbo() {
-    local search_dirs=("arch/arm/boot/dts" "arch/arm64/boot/dts" "out/arch/arm/boot/dts" "out/arch/arm64/boot/dts")
-    local dtb_patterns=("*.dtb" "*.dtbo")
+# Function to copy DTB
+copy_dtb() {
+    if [ -f "$KERNEL_DIR/$DTB_FILE" ]; then
+        cp "$KERNEL_DIR/$DTB_FILE" "$ANYKERNEL_DIR/"
+        echo "Copied DTB: $DTB_FILE"
+    else
+        echo "DTB file not found: $DTB_FILE"
+    fi
+}
 
-    for dir in "${search_dirs[@]}"; do
-        for pattern in "${dtb_patterns[@]}"; do
-            local file=$(find "$KERNEL_DIR/$dir" -name "$pattern" -print -quit)
-            if [ -n "$file" ]; then
-                cp "$file" "$ANYKERNEL_DIR/"
-                echo "Copied DTB/DTBO: $file"
-                return 0
-            fi
-        done
-    done
-
-    echo "No DTB/DTBO file found!"
-    return 0  # Return 0 even if no file found, as it's optional
+# Function to copy DTBO
+copy_dtbo() {
+    if [ -f "$KERNEL_DIR/$DTBO_FILE" ]; then
+        cp "$KERNEL_DIR/$DTBO_FILE" "$ANYKERNEL_DIR/"
+        echo "Copied DTBO: $DTBO_FILE"
+    else
+        echo "DTBO file not found: $DTBO_FILE"
+    fi
 }
 
 # Main execution
 find_and_copy_kernel
-find_and_copy_dtb_dtbo
+
+if [ -n "$DTB_FILE" ]; then
+    copy_dtb
+fi
+
+if [ -n "$DTBO_FILE" ]; then
+    copy_dtbo
+fi
 
 # Create AnyKernel zip
 cd "$ANYKERNEL_DIR"
