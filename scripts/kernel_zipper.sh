@@ -30,7 +30,7 @@ while [[ $# -gt 0 ]]; do
             shift
             ;;
         *)
-            echo "Unknown option: $1" (Available -- options: kernel, dtb, dtbo)
+            echo "Unknown option: $1 (Available -- options: kernel, dtb, dtbo)"
             exit 1
             ;;
     esac
