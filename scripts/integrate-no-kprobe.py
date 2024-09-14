@@ -12,7 +12,7 @@ def modify_ksu_config(defconfig, enable=True):
     defconfig_path = None
     for directory in directories:
         for filename in os.listdir(directory):
-            if filename.endswith("_defconfig") and filename == defconfig:
+            if filename.endswith("_defconfig"):
                 defconfig_path = os.path.join(directory, filename)
                 break
         if defconfig_path:
