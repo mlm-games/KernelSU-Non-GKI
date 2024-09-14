@@ -13,8 +13,9 @@ def modify_ksu_config(defconfig, enable=True):
     for directory in directories:
         for filename in os.listdir(directory):
             if filename.endswith("_defconfig"):
-                defconfig_path = os.path.join(directory, filename)
-                break
+                if os.path.exists(os.path.join(directory, filename))
+                    defconfig_path = os.path.join(directory, filename)
+                    break
         if defconfig_path:
             break
 
