@@ -1,6 +1,28 @@
 import os
 import re
 
+def apply_patch(kernel_path, patch_file):
+    os.chdir(kernel_path)
+    try:
+        # Ensure we're working with a clean state
+        subprocess.run(["git", "reset", "--hard"], check=True)
+        subprocess.run(["git", "clean", "-fd"], check=True)
+        
+        # Apply the patch
+        result = subprocess.run(["git", "apply", "--check", patch_file], check=False, capture_output=True, text=True)
+        if result.returncode == 0:
+            # If --check is successful, apply the patch
+            subprocess.run(["git", "apply", patch_file], check=True)
+            print(f"Successfully applied patch {patch_file}")
+        else:
+            print(f"Patch {patch_file} does not apply cleanly.")
+            print(result.stdout)
+            print(result.stderr)
+    except subprocess.CalledProcessError as e:
+        print(f"An error occurred while applying the patch: {e}")
+        print(f"Output: {e.output}")
+
+
 def modify_ksu_config(defconfig, enable=True):
     # Possible directories for defconfig
     directories = [
@@ -214,7 +236,11 @@ def main():
     parser.add_argument('defconfig', help='Path to the defconfig file')
     parser.add_argument('--disable-ksu', action='store_true', help='Disable KernelSU')
     parser.add_argument('--disable-external-mods', action='store_true', help='Disable external modifications')
+    parser.add_argument('--patch', help='Path to the patch file to apply')
     args = parser.parse_args()
+
+    if args.patch:
+        apply_patch(args.kernel_path, args.patch)
 
     # Modify KSU config based on the defconfig provided
     modify_ksu_config(defconfig=args.defconfig, enable=not args.disable_ksu)
