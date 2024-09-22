@@ -119,25 +119,18 @@ static void ksu_grant_root_to_shell()
 }
 #endif
 
-bool ksu_get_app_profile(struct app_profile *profile)
+struct app_profile *ksu_get_app_profile(uid_t uid)
 {
-	struct perm_data *p = NULL;
-	struct list_head *pos = NULL;
-	bool found = false;
+    struct perm_data *p = NULL;
+    struct list_head *pos = NULL;
 
-	list_for_each (pos, &allow_list) {
-		p = list_entry(pos, struct perm_data, list);
-		bool uid_match = profile->current_uid == p->profile.current_uid;
-		if (uid_match) {
-			// found it, override it with ours
-			memcpy(profile, &p->profile, sizeof(*profile));
-			found = true;
-			goto exit;
-		}
-	}
+    list_for_each(pos, &allow_list) {
+        p = list_entry(pos, struct perm_data, list);
+        if (uid == p->profile.current_uid)
+            return &p->profile;
+    }
 
-exit:
-	return found;
+    return NULL;
 }
 
 static inline bool forbid_system_uid(uid_t uid) {
