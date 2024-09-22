@@ -177,89 +177,43 @@ static bool profile_valid(struct app_profile *profile)
 
 bool ksu_set_app_profile(struct app_profile *profile, bool persist)
 {
-	struct perm_data *p = NULL;
-	struct list_head *pos = NULL;
-	bool result = false;
+    struct perm_data *p = NULL;
+    struct list_head *pos = NULL;
+    bool result = false;
 
-	if (!profile_valid(profile)) {
-		pr_err("Failed to set app profile: invalid profile!\n");
-		return false;
-	}
+    if (!profile_valid(profile)) {
+        pr_err("Failed to set app profile: invalid profile!\n");
+        return false;
+    }
 
-	list_for_each (pos, &allow_list) {
-		p = list_entry(pos, struct perm_data, list);
-		// both uid and package must match, otherwise it will break multiple package with different user id
-		if (profile->current_uid == p->profile.current_uid &&
-		    !strcmp(profile->key, p->profile.key)) {
-			// found it, just override it all!
-			memcpy(&p->profile, profile, sizeof(*profile));
-			result = true;
-			goto out;
-		}
-	}
+    list_for_each(pos, &allow_list) {
+        p = list_entry(pos, struct perm_data, list);
+        if (profile->current_uid == p->profile.current_uid &&
+            !strcmp(profile->key, p->profile.key)) {
+            // found it, just override it all!
+            p->profile = *profile;
+            result = true;
+            goto out;
+        }
+    }
 
-	// not found, alloc a new node!
-	p = (struct perm_data *)kmalloc(sizeof(struct perm_data), GFP_KERNEL);
-	if (!p) {
-		pr_err("ksu_set_app_profile alloc failed\n");
-		return false;
-	}
+    // not found, alloc a new node!
+    p = kmalloc(sizeof(struct perm_data), GFP_KERNEL);
+    if (!p) {
+        pr_err("ksu_set_app_profile alloc failed\n");
+        return false;
+    }
 
-	memcpy(&p->profile, profile, sizeof(*profile));
-	if (profile->allow_su) {
-		pr_info("set root profile, key: %s, uid: %d, gid: %d, context: %s\n",
-			profile->key, profile->current_uid,
-			profile->rp_config.profile.gid,
-			profile->rp_config.profile.selinux_domain);
-	} else {
-		pr_info("set app profile, key: %s, uid: %d, umount modules: %d\n",
-			profile->key, profile->current_uid,
-			profile->nrp_config.profile.umount_modules);
-	}
-	list_add_tail(&p->list, &allow_list);
+    p->profile = *profile;
+    list_add_tail(&p->list, &allow_list);
 
 out:
-	if (profile->current_uid <= BITMAP_UID_MAX) {
-		if (profile->allow_su)
-			allow_list_bitmap[profile->current_uid / BITS_PER_BYTE] |= 1 << (profile->current_uid % BITS_PER_BYTE);
-		else
-			allow_list_bitmap[profile->current_uid / BITS_PER_BYTE] &= ~(1 << (profile->current_uid % BITS_PER_BYTE));
-	} else {
-		if (profile->allow_su) {
-			/*
-			 * 1024 apps with uid higher than BITMAP_UID_MAX
-			 * registered to request superuser?
-			 */
-			if (allow_list_pointer >= ARRAY_SIZE(allow_list_arr)) {
-				pr_err("too many apps registered\n");
-				WARN_ON(1);
-				return false;
-			}
-			allow_list_arr[allow_list_pointer++] = profile->current_uid;
-		} else {
-			remove_uid_from_arr(profile->current_uid);
-		}
-	}
-	result = true;
+    if (persist)
+        persistent_allow_list();
 
-	// check if the default profiles is changed, cache it to a single struct to accelerate access.
-	if (unlikely(!strcmp(profile->key, "$"))) {
-		// set default non root profile
-		memcpy(&default_non_root_profile, &profile->nrp_config.profile,
-		       sizeof(default_non_root_profile));
-	}
-
-	if (unlikely(!strcmp(profile->key, "#"))) {
-		// set default root profile
-		memcpy(&default_root_profile, &profile->rp_config.profile,
-		       sizeof(default_root_profile));
-	}
-
-	if (persist)
-		persistent_allow_list();
-
-	return result;
+    return result;
 }
+
 
 bool __ksu_is_allow_uid(uid_t uid)
 {
