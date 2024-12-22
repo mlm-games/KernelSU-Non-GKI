@@ -54,25 +54,22 @@ def modify_ksu_config(defconfig, enable=True):
     if kprobes_enabled:
         print(f"Error: CONFIG_KPROBES is enabled in {defconfig_path}. Follow the official docs for kprobe integration.")
         exit()
-
+        
     # Check if CONFIG_KSU is already present
-    ksu_regex = re.compile(r'^CONFIG_KSU=.*$', re.MULTILINE)
-    ksu_match = ksu_regex.search(content)
-
-    new_config = "CONFIG_KSU=y" if enable else "CONFIG_KSU=n"
-
-    if ksu_match:
-        # Replace existing CONFIG_KSU line
-        new_content = ksu_regex.sub(new_config, content)
-    else:
-        # Add new CONFIG_KSU line
-        new_content = content + f"\n\n# KernelSU\n{new_config}\n"
-
-    # Write the modified content back to the file
-    with open(defconfig_path, 'w') as file:
-        file.write(new_content)
-
-    print(f"Successfully {'enabled' if enable else 'disabled'} CONFIG_KSU in {defconfig_path}")
+        ksu_regex = re.compile(r'^CONFIG_KSU=.*$', re.MULTILINE)
+        ksu_match = ksu_regex.search(content)
+        new_config = "CONFIG_KSU=y" if enable else "CONFIG_KSU=n"
+        if ksu_match:
+            # Replace existing CONFIG_KSU line
+            new_content = ksu_regex.sub(new_config, content)
+        else:
+            # Add new CONFIG_KSU line
+            new_content = content + f"\n\n# KernelSU\n{new_config}\n"
+        # Write the modified content back to the file
+        with open(defconfig_path, 'w') as file:
+            file.write(new_content)
+            
+        print(f"Successfully {'enabled' if enable else 'disabled'} CONFIG_KSU in {defconfig_path}")
 
 def add_ksu_header(file_path, disable_external_mods=False):
     with open(file_path, 'r') as file:
@@ -234,7 +231,8 @@ def main():
     import argparse
     parser = argparse.ArgumentParser(description='KernelSU integration script')
     parser.add_argument('defconfig', help='Path to the defconfig file')
-    parser.add_argument('--disable-ksu', action='store_true', help='Disable KernelSU')
+    parser.add_argument('--disable-ksu', action='store_true', help='Remove KernelSU (and its modifications in drivers)')
+    parser.add_argument('--no-defconfig-flag', action='store_true', help='Does not add CONFIG_KSU=y flag into defconfig')
     parser.add_argument('--disable-external-mods', action='store_true', help='Disable external modifications')
     parser.add_argument('--patch', help='Path to the patch file to apply')
     args = parser.parse_args()
@@ -242,8 +240,9 @@ def main():
     if args.patch:
         apply_patch(args.kernel_path, args.patch)
 
+    if args.no_defconfig_flag:
     # Modify KSU config based on the defconfig provided
-    modify_ksu_config(defconfig=args.defconfig, enable=not args.disable_ksu)
+        modify_ksu_config(defconfig=args.defconfig, enable=not args.disable_ksu)
 
     # Define the paths to your kernel source files
     file_paths = [
