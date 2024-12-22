@@ -230,17 +230,18 @@ def main():
     # Parse command-line arguments
     import argparse
     parser = argparse.ArgumentParser(description='KernelSU integration script')
-    parser.add_argument('defconfig', help='Path to the defconfig file')
+    parser.add_argument('defconfig', nargs='?', help='Path to the defconfig file')
     parser.add_argument('--disable-ksu', action='store_true', help='Remove KernelSU (and its modifications in drivers)')
     parser.add_argument('--no-defconfig-flag', action='store_true', help='Does not add CONFIG_KSU=y flag into defconfig')
     parser.add_argument('--disable-external-mods', action='store_true', help='Disable external modifications')
     parser.add_argument('--patch', help='Path to the patch file to apply')
+    parser.add_argument('--kernel-path', help='Path to the kernel source directory')
     args = parser.parse_args()
 
     if args.patch:
         apply_patch(args.kernel_path, args.patch)
 
-    if args.no_defconfig_flag:
+    if not args.no_defconfig_flag:
     # Modify KSU config based on the defconfig provided
         modify_ksu_config(defconfig=args.defconfig, enable=not args.disable_ksu)
 
