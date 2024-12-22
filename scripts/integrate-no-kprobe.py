@@ -92,11 +92,13 @@ def add_ksu_header(file_path, disable_external_mods=False):
             print(f"Error: Couldn't find the end of the last #include line in {file_path}")
     else:
         print(f"Error: No #include statements found in {file_path}")
-        
+
 def add_ksu_calls(file_path, function_names, ksu_code, disable_external_mods=False):
     with open(file_path, 'r') as file:
         content = file.read()
 
+    file_name = os.path.basename(file_path)
+    
     # Try to find any of the provided function names
     for function_name in function_names:
         if function_name.startswith('SYSCALL_DEFINE'):
@@ -110,34 +112,38 @@ def add_ksu_calls(file_path, function_names, ksu_code, disable_external_mods=Fal
             match = re.search(pattern, content, re.DOTALL)
         
         if match:
-            break
-    
-    if match:
-        # Find the position of the first 'if' statement after the function opening
-        function_body = content[match.end():]
-        if_match = re.search(r'\n\s*if\s*\(', function_body)
-        
-        if if_match:
-            insert_pos = match.end() + if_match.start()
-
-            # One letter difference
-            if function_name == 'vfs_statx':
-                ksu_code = ksu_code.replace('&flag', '&flags')
-            
-            # Insert KSU code before the first 'if' statement
-            if not disable_external_mods or file_path.endswith(('exec.c', 'open.c', 'read_write.c', 'stat.c')):
-                modified_content = content[:insert_pos] + "\n\n" + ksu_code + '\n' + content[insert_pos:]
+            # Find the appropriate insertion point based on the file
+            if file_name == 'inode.c':
+                # For inode.c, insert after the opening brace
+                opening_brace = content.find('{', match.start())
+                if opening_brace != -1:
+                    insert_pos = opening_brace + 1
+            elif file_name == 'input.c':
+                # For input.c, find the first line after disposition declaration
+                disposition_line = content.find('disposition', match.start())
+                if disposition_line != -1:
+                    insert_pos = content.find('\n', disposition_line) + 1
             else:
-                modified_content = content  # No changes for external modifications if disabled
+                # For other files, find the first if statement
+                function_body = content[match.end():]
+                if_match = re.search(r'\n\s*if\s*\(', function_body)
+                if if_match:
+                    insert_pos = match.end() + if_match.start()
+                else:
+                    print(f"No suitable insertion point found in {function_name}")
+                    continue
+
+            # Insert KSU code
+            if not disable_external_mods or file_path.endswith(('exec.c', 'open.c', 'read_write.c', 'stat.c')):
+                modified_content = content[:insert_pos] + "\n" + ksu_code + content[insert_pos:]
+                
+                # Write the modified content back to the file
+                with open(file_path, 'w') as file:
+                    file.write(modified_content)
+                print(f"Added KSU calls to {function_name} in {file_path}")
+                return
             
-            # Write the modified content back to the file
-            with open(file_path, 'w') as file:
-                file.write(modified_content)
-            print(f"Added KSU calls to {function_name} in {file_path}")
-        else:
-            print(f"No 'if' statement found in {function_name} in {file_path}")
-    else:
-        print(f"Function {', '.join(function_names)} not found in {file_path}")
+    print(f"Function {', '.join(function_names)} not found in {file_path}")
 
 def process_kernel_source(file_paths, enable_ksu=True, disable_external_mods=False):
     for file_path in file_paths:
