@@ -42,6 +42,7 @@ perform_cleanup() {
     fi
     # If u had manually deleted the KernelSU directory
     rm -rf "$KERNEL_DIR/.git/modules/KernelSU" || true
+    rm -rf "$KERNEL_DIR/include/ksu_hook.h"
 }
 
 # Sets up or update KernelSU environment
@@ -60,6 +61,9 @@ setup_kernelsu() {
     # Add entries in Makefile and Kconfig if not already existing
     grep -q "kernelsu" "$DRIVER_MAKEFILE" || printf "\nobj-\$(CONFIG_KSU) += kernelsu/\n" >> "$DRIVER_MAKEFILE" && echo "[+] Modified Makefile."
     grep -q "source \"drivers/kernelsu/Kconfig\"" "$DRIVER_KCONFIG" || sed -i "/endmenu/i\source \"drivers/kernelsu/Kconfig\"" "$DRIVER_KCONFIG" && echo "[+] Modified Kconfig."
+
+    # Add the ksu_hook.h to include folder.
+    cp "$KERNEL_DIR/KernelSU/kernel/include/ksu_hook.h" "$KERNEL_DIR/include/ksu_hook.h" && echo "[+] Added hookfile to include."
     echo '[+] Done.'
 }
 
