@@ -77,13 +77,22 @@ def add_ksu_header(file_path, disable_external_mods=False):
     
     # Find the last #include statement
     last_include = content.rfind('#include')
-    if last_include != -1:
+    if last_include!= -1:
         # Find the end of the line containing the last #include
         end_of_line = content.find('\n', last_include)
-        if end_of_line != -1:
-            # Insert the new header after the last #include
-            new_header = '\n#ifdef CONFIG_KSU\n#include <ksu_hook.h>\n#endif\n'
-            modified_content = content[:end_of_line + 1] + new_header + content[end_of_line + 1:]
+        if end_of_line!= -1:
+            # Check if there is a #endif just below
+            next_line = content[end_of_line + 1:].lstrip()
+            if next_line.startswith('#endif'):
+                # Find the end of the #endif line
+                endif_end = content.find('\n', end_of_line + 1) + 1
+                # Insert the new header after the #endif
+                new_header = '\n#ifdef CONFIG_KSU\n#include <ksu_hook.h>\n#endif\n'
+                modified_content = content[:endif_end] + new_header + content[endif_end:]
+            else:
+                # Insert the new header after the last #include
+                new_header = '\n#ifdef CONFIG_KSU\n#include <ksu_hook.h>\n#endif\n'
+                modified_content = content[:end_of_line + 1] + new_header + content[end_of_line + 1:]
             
             with open(file_path, 'w') as file:
                 file.write(modified_content)
