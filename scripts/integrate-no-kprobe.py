@@ -202,7 +202,6 @@ ksu_calls = {
     'stat.c': {
         'functions': ['vfs_statx', 'vfs_fstatat'],
         'code': '''   #ifdef CONFIG_KSU
-        if (unlikely(ksu_vfs_stat_hook))
             ksu_handle_stat(&dfd, &filename, &flag);
     #endif'''
     },
