@@ -103,7 +103,6 @@ def add_ksu_header(file_path, disable_external_mods=False):
         print(f"Error: No #include statements found in {file_path}")
 
 def add_ksu_calls(file_path, function_names, ksu_code, disable_external_mods=False):
-def add_ksu_calls(file_path, function_names, ksu_code, disable_external_mods=False):
     with open(file_path, 'r') as file:
         content = file.read()
 
