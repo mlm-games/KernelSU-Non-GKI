@@ -42,7 +42,7 @@ perform_cleanup() {
     fi
     # If u had manually deleted the KernelSU directory
     rm -rf "$KERNEL_DIR/.git/modules/KernelSU" || true
-    rm -rf "$KERNEL_DIR/include/ksu_hook.h"
+    #rm -rf "$KERNEL_DIR/include/ksu_hook.h"
 }
 
 # Sets up or update KernelSU environment
