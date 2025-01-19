@@ -12,7 +12,7 @@ on:
       defconfig:
         description: 'Defconfig file name'
         required: true
-        default: 'your_default_defconfig'
+        default: 'mt8765_P_defconfig'
       repo_url:
         description: 'Kernel repository URL (without https://github.com/)'
         required: true
@@ -24,7 +24,7 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04-arm
     strategy:
       fail-fast: true
     steps:
