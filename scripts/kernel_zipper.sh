@@ -46,7 +46,7 @@ git clone "$ANYKERNEL_REPO" "$ANYKERNEL_DIR" --depth=1
 
 # Function to find and copy kernel image
 find_and_copy_kernel() {
-    local search_dirs=("arch/arm/boot" "arch/arm64/boot" "out/arch/arm/boot" "out/arch/arm64/boot")
+    local search_dirs=("out/arch/arm64/boot" "out/arch/arm/boot" "arch/arm/boot" "arch/arm64/boot")
     local kernel_names=("zImage-dtb" "Image.gz-dtb" "Image.gz"  "Image" "kernel")
     
     if [ -f "$KERNEL_FILE" ]; then
