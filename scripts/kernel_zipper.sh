@@ -81,8 +81,7 @@ copy_dtb() {
         cp "$KERNEL_DIR/$DTB_FILE" "$ANYKERNEL_DIR/"
         echo "Copied DTB: $DTB_FILE"
     else
-        echo "DTB file not found: $DTB_FILE"
-        exit
+        echo " ::warning:: DTB file not found: $DTB_FILE"
     fi
 }
 
@@ -92,8 +91,7 @@ copy_dtbo() {
         cp "$KERNEL_DIR/$DTBO_FILE" "$ANYKERNEL_DIR/"
         echo "Copied DTBO: $DTBO_FILE"
     else
-        echo "DTBO file not found: $DTBO_FILE"
-        exit
+        echo " ::warning:: DTBO file not found: $DTBO_FILE"
     fi
 }
 
