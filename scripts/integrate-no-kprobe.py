@@ -1,5 +1,6 @@
 import os
 import re
+import warnings
 
 def apply_patch(kernel_path, patch_file):
     os.chdir(kernel_path)
@@ -51,7 +52,7 @@ def modify_ksu_config(defconfig, enable=True):
     # Check if CONFIG_KPROBES is enabled
     kprobes_enabled = re.search(r'^CONFIG_KPROBES=y$', content, re.MULTILINE)
     if kprobes_enabled:
-        sys.exit(f"Error: CONFIG_KPROBES is enabled in {defconfig_path}. Follow the official docs for kprobe integration.")
+        warnings.warn(f"CONFIG_KPROBES is enabled in {defconfig_path}. Follow the official docs for kprobe integration.")
         
     # Check if CONFIG_KSU is already present
         ksu_regex = re.compile(r'^CONFIG_KSU=.*$', re.MULTILINE)
