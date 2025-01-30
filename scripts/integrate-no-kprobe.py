@@ -95,7 +95,7 @@ def add_ksu_header(file_path, disable_external_mods=False):
             with open(file_path, 'w') as file:
                 file.write(modified_content)
             print(f"Added KSU header to {file_path}")
-        else:
+        else: 
             print(f"Error: Couldn't find the end of the last #include line in {file_path}")
     else:
         print(f"Error: No #include statements found in {file_path}")
