@@ -7,7 +7,7 @@ SCRIPT_PATH=$(dirname "$SCRIPT")
 ANYKERNEL_REPO="https://github.com/mlm-games/AnyKernel3.git"
 ANYKERNEL_DIR="$SCRIPT_PATH/../../AnyKernel3"
 KERNEL_DIR="$SCRIPT_PATH/../.."  # Replace with actual path if yours is different
-FINAL_KERNEL_ZIP="RuskKernel.zip"
+FINAL_KERNEL_ZIP="flashable-anykernel.zip"
 
 # Initialize variables
 DTB_FILE=""
