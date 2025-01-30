@@ -42,8 +42,7 @@ def modify_ksu_config(defconfig, enable=True):
             break
 
     if not defconfig_path:
-        print("Error: Could not find defconfig file.")
-        return
+        sys.exit("Error: Could not find defconfig file.")
 
     # Read the current content of the defconfig file
     with open(defconfig_path, 'r') as file:
@@ -52,8 +51,7 @@ def modify_ksu_config(defconfig, enable=True):
     # Check if CONFIG_KPROBES is enabled
     kprobes_enabled = re.search(r'^CONFIG_KPROBES=y$', content, re.MULTILINE)
     if kprobes_enabled:
-        print(f"Error: CONFIG_KPROBES is enabled in {defconfig_path}. Follow the official docs for kprobe integration.")
-        exit()
+        sys.exit(f"Error: CONFIG_KPROBES is enabled in {defconfig_path}. Follow the official docs for kprobe integration.")
         
     # Check if CONFIG_KSU is already present
         ksu_regex = re.compile(r'^CONFIG_KSU=.*$', re.MULTILINE)
