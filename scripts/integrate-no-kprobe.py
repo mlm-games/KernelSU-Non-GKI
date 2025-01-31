@@ -246,6 +246,7 @@ def main():
     parser = argparse.ArgumentParser(description='KernelSU integration script')
     parser.add_argument('defconfig', nargs='?', help='Path to the defconfig file')
     parser.add_argument('--disable-ksu', action='store_true', help='Remove KernelSU (and its modifications in drivers)')
+    parser.add_argument('--enable-ksu-only-in-defconfig', action='store_true', help='Add CONFIG_KSU=y flag in defconfig only')
     parser.add_argument('--no-defconfig-flag', action='store_true', help='Does not add CONFIG_KSU=y flag into defconfig')
     parser.add_argument('--disable-external-mods', action='store_true', help='Disable external modifications')
     parser.add_argument('--patch', help='Path to the patch file to apply')
@@ -269,8 +270,9 @@ def main():
         './drivers/input/input.c'
     ]
 
+    if not args.enable_ksu_only_in_defconfig:
     # Process kernel source files
-    process_kernel_source(file_paths, enable_ksu=not args.disable_ksu, disable_external_mods=args.disable_external_mods)
+        process_kernel_source(file_paths, enable_ksu=not args.disable_ksu, disable_external_mods=args.disable_external_mods)
 
 if __name__ == '__main__':
     main()
