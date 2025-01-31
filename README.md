@@ -29,7 +29,7 @@ If you want to enable KernelSU only in your defconfig:
 python3 KernelSU/scripts/integrate-no-kprobe.py some_random_defconfig --enable-ksu-only-in-defconfig
 ```
 
-This script that makes an AnyKernel3 package and (optional) allows you to specify the DTB and DTBO files using the --dtb=filepath and --dtbo=filepath flags. For example:
+There is also an script that makes an AnyKernel3 package and (optional) allows you to specify the DTB and DTBO files using the --dtb=filepath and --dtbo=filepath flags. For example:
 ```
 ./KernelSU/scripts/kernel_zipper.sh [--dtb=path/to/dtb/file.dtb] [--dtbo=path/to/dtbo/file.dtbo] [--kernel=path/to/kernel]
 ```
