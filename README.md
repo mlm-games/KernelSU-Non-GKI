@@ -24,6 +24,10 @@ If you want to disable external modifications (non neccessary ones like inode.c,
 ```
 python3 KernelSU/scripts/integrate-no-kprobe.py your_defconfig --disable-external-mods
 ```
+If you want to enable KernelSU only in your defconfig:
+```
+python3 KernelSU/scripts/integrate-no-kprobe.py some_random_defconfig --enable-ksu-only-in-defconfig
+```
 
 This script that makes an AnyKernel3 package and (optional) allows you to specify the DTB and DTBO files using the --dtb=filepath and --dtbo=filepath flags. For example:
 ```
