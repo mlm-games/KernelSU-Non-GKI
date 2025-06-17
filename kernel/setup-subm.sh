@@ -3,12 +3,30 @@ set -eu
 
 KERNEL_DIR=$(pwd)
 
+# Define repository URLs
+KSU_NEXT_REPO="https://github.com/KernelSU-Next/KernelSU-Next.git"
+KSU_OLD_REPO="https://github.com/mlm-games/KernelSU-Non-GKI.git"
+
+# Default to KernelSU-Next
+REPO_URL="$KSU_NEXT_REPO"
+REPO_NAME="KernelSU-Next"
+
+# Check for the --kernelsu-old flag
+for arg in "$@"; do
+  if [ "$arg" = "--kernelsu-old" ]; then
+    REPO_URL="$KSU_OLD_REPO"
+    REPO_NAME="KernelSU (Old)"
+    echo "[+] Flag --kernelsu-old detected. Using the old repository."
+  fi
+done
+
 display_usage() {
-    echo "Usage: $0 [--cleanup | <commit-or-tag>]"
+    echo "Usage: $0 [--cleanup | --kernelsu-old | <commit-or-tag>]"
     echo "  --cleanup:              Cleans up previous modifications made by the script."
+    echo "  --kernelsu-old:         Use the original mlm-games/KernelSU-Non-GKI repository."
     echo "  <commit-or-tag>:        Sets up or updates the KernelSU to specified tag or commit."
     echo "  -h, --help:             Displays this usage information."
-    echo "  (no args):              Sets up or updates the KernelSU environment to the latest tagged version."
+    echo "  (no args):              Sets up KernelSU-Next by default."
 }
 
 initialize_variables() {
@@ -47,12 +65,14 @@ perform_cleanup() {
 
 # Sets up or update KernelSU environment
 setup_kernelsu() {
-    echo "[+] Setting up KernelSU..."
-    test -d "$KERNEL_DIR/KernelSU" || git submodule add https://github.com/mlm-games/KernelSU-Non-GKI KernelSU
+    echo "[+] Setting up $REPO_NAME..."
+    
+    # Use the selected REPO_URL
+    test -d "$KERNEL_DIR/KernelSU" || git submodule add "$REPO_URL" KernelSU
     git submodule update --init --recursive
 
     ln -sfn "$(realpath --relative-to="$DRIVER_DIR" "$KERNEL_DIR/KernelSU/kernel")" "$DRIVER_DIR/kernelsu" && echo "[+] Symlink to kernelsu created."
-
+    
     # Later when i have tags
     # if [ -n "$1" ]; then
     #     (cd KernelSU && git checkout "$1") && echo "[-] Checked out $1." || echo "[-] Failed to checkout $1."
@@ -68,15 +88,19 @@ setup_kernelsu() {
 }
 
 # Process command-line arguments
-if [ "$#" -eq 0 ]; then
-    initialize_variables
-    setup_kernelsu
-elif [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
-    display_usage
-elif [ "$1" = "--cleanup" ]; then
-    initialize_variables
-    perform_cleanup
-else
-    initialize_variables
-    setup_kernelsu "$@"
+if [ "$#" -gt 0 ]; then
+    case "$1" in
+        -h|--help)
+            display_usage
+            exit 0
+            ;;
+        --cleanup)
+            initialize_variables
+            perform_cleanup
+            exit 0
+            ;;
+    esac
 fi
+
+initialize_variables
+setup_kernelsu "$@"
