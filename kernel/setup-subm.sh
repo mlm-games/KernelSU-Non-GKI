@@ -96,7 +96,7 @@ setup_kernelsu() {
     grep -q "kernelsu" "$DRIVER_MAKEFILE" || printf "\nobj-\$(CONFIG_KSU) += kernelsu/\n" >> "$DRIVER_MAKEFILE" && echo "[+] Modified Makefile."
     grep -q 'source "drivers/kernelsu/Kconfig"' "$DRIVER_KCONFIG" || sed -i '$isource "drivers/kernelsu/Kconfig"' "$DRIVER_KCONFIG" && echo "[+] Modified Kconfig."
 
-    # If using the old repo, run the mandatory python patch script
+    # If using the old repo, run the python patch script from repo
     if [ "$REPO_NAME" = "KernelSU (Old)" ]; then
         if [ -z "$DEFCONFIG_PATH" ]; then
             echo "[ERROR] The --kernelsu-old flag requires a --defconfig=<path> argument." >&2
@@ -110,6 +110,10 @@ setup_kernelsu() {
         
         echo "[+] Running non-kprobe integration script on '$DEFCONFIG_PATH'..."
         python3 "$KERNEL_DIR/KernelSU/scripts/integrate-no-kprobe.py" "$DEFCONFIG_PATH" $EXTRA_PYTHON_ARGS
+        echo "[+] Python patch script executed successfully."
+    else 
+        echo "[+] Running non-kprobe integration script on '$DEFCONFIG_PATH'..."
+        curl -LSs "https://raw.githubusercontent.com/mlm-games/KernelSU-Non-GKI/refs/heads/main/scripts/integrate-no-kprobe.py" | python3 "$DEFCONFIG_PATH" $EXTRA_PYTHON_ARGS
         echo "[+] Python patch script executed successfully."
     fi
 
