@@ -144,16 +144,17 @@ setup_kernelsu() {
     else
         # Download the script if it doesn't exist in the submodule
         echo "[+] Script not found in submodule, downloading..."
-        TEMP_SCRIPT=$(mktemp)
-        if curl -LSs "https://raw.githubusercontent.com/mlm-games/KernelSU-Non-GKI/refs/heads/main/scripts/integrate-no-kprobe.py" -o "$TEMP_SCRIPT"; then
-            python3 "$TEMP_SCRIPT" "$DEFCONFIG_PATH" $EXTRA_PYTHON_ARGS
-            rm -f "$TEMP_SCRIPT"
-            echo "[+] Python patch script executed successfully."
-        else
-            echo "[ERROR] Failed to download the Python script." >&2
-            rm -f "$TEMP_SCRIPT"
-            exit 1
-        fi
+        TEMP_SCRIPT="$KERNEL_DIR/KernelSU/scripts/integrate-no-kprobe.py"
+        curl -LSs "https://raw.githubusercontent.com/mlm-games/KernelSU-Non-GKI/refs/heads/main/scripts/integrate-no-kprobe.py" -o "$TEMP_SCRIPT"
+        # if curl -LSs "https://raw.githubusercontent.com/mlm-games/KernelSU-Non-GKI/refs/heads/main/scripts/integrate-no-kprobe.py" -o "$TEMP_SCRIPT"; then
+            # python3 "$TEMP_SCRIPT" "$DEFCONFIG_PATH" $EXTRA_PYTHON_ARGS
+            # rm -f "$TEMP_SCRIPT"
+            # echo "[+] Python patch script executed successfully."
+        # else
+            # echo "[ERROR] Failed to download the Python script." >&2
+            # rm -f "$TEMP_SCRIPT"
+            # exit 1
+        # fi
     fi
 
     # Add the ksu_hook.h to include folder
