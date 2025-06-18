@@ -73,7 +73,7 @@ perform_cleanup() {
             python3 "$KERNEL_DIR/KernelSU/scripts/integrate-no-kprobe.py" "$DEFCONFIG_PATH" --disable-ksu
             echo "[-] Python script cleanup executed."
         else
-            echo "[WARNING] Could not find defconfig for cleanup. Manual cleanup may be required."
+            echo "[WARNING] Could not find defconfig for cleanup. Manual cleanup may be ."
         fi
     fi
 
@@ -101,16 +101,16 @@ perform_cleanup() {
 setup_kernelsu() {
     echo "[+] Setting up $REPO_NAME..."
     
-    # Check if defconfig is provided (required for both repos now)
-    if [ -z "$DEFCONFIG_PATH" ]; then
-        echo "[ERROR] The --defconfig=<path> argument is required." >&2
-        display_usage
-        exit 1
-    fi
-    if [ ! -f "$DEFCONFIG_PATH" ]; then
-        echo "[ERROR] Defconfig file not found at: $DEFCONFIG_PATH" >&2
-        exit 1
-    fi
+    # Check if defconfig is provided ( for both repos now)
+    # if [ -z "$DEFCONFIG_PATH" ]; then
+    #     echo "[ERROR] The --defconfig=<path> argument is required." >&2
+    #     display_usage
+    #     exit 1
+    # fi
+    # if [ ! -f "$DEFCONFIG_PATH" ]; then
+    #     echo "[ERROR] Defconfig file not found at: $DEFCONFIG_PATH" >&2
+    #     exit 1
+    # fi
     
     # Add submodule if it doesn't exist, then update it
     if [ ! -d "$KERNEL_DIR/KernelSU" ]; then
@@ -134,13 +134,14 @@ setup_kernelsu() {
     fi
     
     # Run the python patch script
-    echo "[+] Running non-kprobe integration script on '$DEFCONFIG_PATH'..."
+    # echo "[+] Running non-kprobe integration script on '$DEFCONFIG_PATH'..."
     
     # Check if the script exists in the submodule
     if [ -f "$KERNEL_DIR/KernelSU/scripts/integrate-no-kprobe.py" ]; then
+        echo ".py File exists"
         # Use the script from the submodule
-        python3 "$KERNEL_DIR/KernelSU/scripts/integrate-no-kprobe.py" "$DEFCONFIG_PATH" $EXTRA_PYTHON_ARGS
-        echo "[+] Python patch script executed successfully."
+        # python3 "$KERNEL_DIR/KernelSU/scripts/integrate-no-kprobe.py" "$DEFCONFIG_PATH" $EXTRA_PYTHON_ARGS
+        # echo "[+] Python patch script executed successfully."
     else
         # Download the script if it doesn't exist in the submodule
         echo "[+] Script not found in submodule, downloading..."
