@@ -34,7 +34,7 @@ jobs:
         swap-size-gb: 10
         
     - name: Checkout repo
-      uses: actions/checkout@v6
+      uses: actions/checkout@v7
       with:
         repository: ${{ github.event.inputs.repo_url || 'mlm-games/android_kernel_lenovo_mt8765_P' }}
         ref: ${{ github.event.inputs.branch || 'stock' }}
